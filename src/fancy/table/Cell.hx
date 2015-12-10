@@ -1,6 +1,7 @@
 package fancy.table;
 
 using fancy.browser.Dom;
+import fancy.table.util.Types;
 import js.html.Element;
 import js.html.Event;
 
@@ -10,6 +11,9 @@ class Cell {
   public var fixed(default, set) : Bool;
   // TODO: consider making this an eventemitter instead
   public var onclick(default, set) : Event -> Void;
+
+  public var preferredFormatting(default, set): CellFormatting;
+  var currentFormatting : CellFormatting;
 
   public function new(?value : String, ?fixed = false, ?onclick : Event -> Void) {
     this.el = Dom.create("div.ft-cell", value);
@@ -30,6 +34,11 @@ class Cell {
   function set_value(value : String) {
     el.textContent = value;
     return this.value = value;
+  }
+
+  function set_preferredFormatting(value : CellFormatting) {
+    // TODO: check the ability to format, then update the dom here
+    return this.preferredFormatting = value;
   }
 
   function set_onclick(fn : Event -> Void) {

@@ -21,3 +21,10 @@ typedef FancyRowClasses = {
   ?hidden : String,
   ?indent : String
 };
+
+enum CellFormatting {
+  number;
+  date;
+  currency;
+  string;
+}
