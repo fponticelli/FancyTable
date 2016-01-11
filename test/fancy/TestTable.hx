@@ -1,4 +1,4 @@
-package test.fancy;
+package fancy;
 
 import fancy.Table;
 import thx.Tuple;
@@ -19,5 +19,11 @@ class TestTable {
     Assert.isFalse(Table.foldsIntersect(new Tuple2(0, 8), new Tuple2(0, 2)));
     Assert.isFalse(Table.foldsIntersect(new Tuple2(0, 3), new Tuple2(8, 4)));
     Assert.isFalse(Table.foldsIntersect(new Tuple2(1, 7), new Tuple2(3, 1)));
+  }
+
+  public function testFindExistingFolds() {
+    var existingFolds = Table.findExistingFolds(new Tuple2(0, 2), new Tuple2(1, 1));
+    Assert.same(1, existingFolds.length);
+    Assert.same(new Tuple2(0, 2), existingFolds[0]);
   }
 }

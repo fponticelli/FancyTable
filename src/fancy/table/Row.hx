@@ -35,6 +35,7 @@ class Row {
       classes : {},
       colCount : 0,
       expanded : true,
+      hidden : false,
       fixedCellCount : 0,
       indentation : 0
     }, options == null ? ({} : FancyRowOptions) : options);
@@ -47,7 +48,8 @@ class Row {
       collapsed : "ft-row-collapsed",
       foldHeader : "ft-row-fold-header",
       hidden : "ft-row-hidden",
-      indent : "ft-row-indent-"
+      indent : "ft-row-indent-",
+      custom : ""
     }, classes == null ? {} : classes);
   }
 
@@ -55,7 +57,9 @@ class Row {
     var childElements = (children != null ? children : []).map.fn(_.el);
     return Dom.create('div.${settings.classes.row}', {}, childElements)
       .addClass(settings.expanded ? settings.classes.expanded : settings.classes.collapsed)
+      .addClass(settings.hidden ? settings.classes.hidden : "")
       .addClass('${settings.classes.indent}${settings.indentation}')
+      .addClass(settings.classes.custom)
       .addClass(rows.length == 0 ? "" : settings.classes.foldHeader);
   }
 
@@ -102,6 +106,12 @@ class Row {
     return this;
   }
 
+  public function setCustomClass(className : String) {
+    removeRowClass(settings.classes.custom);
+    settings.classes.custom = className;
+    return addRowClass(className);
+  }
+
   public function appendCell(?col : Cell) : Row {
     return insertCell(cells.length, col);
   }
@@ -117,6 +127,13 @@ class Row {
     rows.push(child);
   }
 
+  public function removeChildRow(child : Row) {
+    rows.remove(child);
+    if (rows.length == 0) {
+      removeRowClass(settings.classes.foldHeader);
+    }
+  }
+
   public function indent() {
     removeRowClass('${settings.classes.indent}${settings.indentation}');
     settings.indentation++;
@@ -126,17 +143,13 @@ class Row {
   public function expand() {
     settings.expanded = true;
     removeRowClass(settings.classes.collapsed).addRowClass(settings.classes.expanded);
-    rows.map(function (row) {
-      row.removeRowClass(settings.classes.hidden);
-    });
+    rows.map.fn(_.show());
   }
 
   public function collapse() {
     settings.expanded = false;
     removeRowClass(settings.classes.expanded).addRowClass(settings.classes.collapsed);
-    rows.map(function (row) {
-      row.addRowClass(settings.classes.hidden);
-    });
+    rows.map.fn(_.hide());
   }
 
   public function toggle() {
@@ -144,6 +157,24 @@ class Row {
       collapse();
     else
       expand();
+  }
+
+  function hide() {
+    settings.hidden = true;
+
+    // any time a row is hidden, make sure its children are also hidden
+    rows.map.fn(_.hide());
+    return addRowClass(settings.classes.hidden);
+  }
+
+  public function show() {
+    settings.hidden = false;
+
+    // and when a row is shown, if that row is also expanded, show the children
+    if (settings.expanded) {
+      rows.map.fn(_.show());
+    }
+    return removeRowClass(settings.classes.hidden);
   }
 
   public function setCellValue(index : Int, value : String) : Row {
